@@ -284,13 +284,22 @@ def assign_device(vlid):
     db.session.add(newDeviceAssignment)
     db.session.commit()
 
-    message = "Hello User, The device with VLBB ID {0} is assigned to your name".format(vlid) + \
+    # send email to admins aand usrs
+    message = "Hello {0}, \n\n The device with VL Tag {1} is assigned to your name \n ".format(user.firstname, vlid) + \
+		"If this device is not with you, please contact inventory admins"
               "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
-    msg = Message('Hello', sender='purush.bb10@gmail.com', recipients=['purushotham.c@gmail.com'])
+    subject = 'New Device {0} is assigned with your name'.format(vlid)
+    sender = "pchowdam@blackberry.com"
+    recipients = []
+    recipients.append(user.email)
+    recipients.append("ksunkara@blackberry.com")
+    recipients.append("gtadala@blackberry.com")
+    
+  
+    msg = Message(subject, sender=sender, recipients=recipients)
     msg.body = message
     t = Thread(name="mail-sending-thread", target=mail.send(msg))
     t.start()
-    #mail.send(msg)
 
     message = "Device with VLBB ID {0} is assigned with your name".format(vlid)
     return render_template('search_device.html', success=True, message=message, from_assigned=True)
@@ -323,6 +332,23 @@ def assign_device_user():
                                            user_id=user.uid, device_assigned_date=device.assigned_date)
         db.session.add(newDeviceAssignment)
         db.session.commit()
+
+	message = "Hello {0}, \n\n The device with VL Tag {1} is assigned to your name \n ".format(user.firstname, vlid) + \
+                "If this device is not with you, please contact inventory admins"
+              "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
+
+	subject = 'New Device {0} is assigned with your name'.format(vlid)
+        sender = "pchowdam@blackberry.com"
+        recipients = []
+        recipients.append(user.email)
+        recipients.append("ksunkara@blackberry.com")
+        recipients.append("gtadala@blackberry.com")
+
+        msg = Message(subject, sender=sender, recipients=recipients)
+        msg.body = message
+        t = Thread(name="mail-sending-thread", target=mail.send(msg))
+        t.start()
+
         message = "User is assigned with device {0}".format(device.vl_tag)
         return render_template('assign_device_user.html', form=form, success=True, message=message)
 

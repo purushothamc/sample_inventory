@@ -294,7 +294,7 @@ def assign_device(vlid):
     recipients.append(user.email)
     recipients.append("ksunkara@blackberry.com")
     recipients.append("gtadala@blackberry.com")
-    
+    recipients.append("pchowdam@blackberry.com")
   
     msg = Message(subject, sender=sender, recipients=recipients)
     msg.body = message
@@ -344,6 +344,7 @@ def assign_device_user():
         recipients.append(user.email)
         recipients.append("ksunkara@blackberry.com")
         recipients.append("gtadala@blackberry.com")
+        recipients.append("pchowdam@blackberry.com")
 
         msg = Message(subject, sender=sender, recipients=recipients)
         msg.body = message

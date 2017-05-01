@@ -286,7 +286,7 @@ def assign_device(vlid):
 
     # send email to admins aand usrs
     message = "Hello {0}, \n\n The device with VL Tag {1} is assigned to your name \n ".format(user.firstname, vlid) + \
-		"If this device is not with you, please contact inventory admins"
+              "If this device is not with you, please contact inventory admins" +\
               "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
     subject = 'New Device {0} is assigned with your name'.format(vlid)
     sender = "pchowdam@blackberry.com"
@@ -333,11 +333,12 @@ def assign_device_user():
         db.session.add(newDeviceAssignment)
         db.session.commit()
 
-	message = "Hello {0}, \n\n The device with VL Tag {1} is assigned to your name \n ".format(user.firstname, vlid) + \
-                "If this device is not with you, please contact inventory admins"
-              "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
+        message = "Hello {0}, \n\n The device with VL Tag {1} is assigned to your name \n ".format(user.firstname,
+                                                                                                   device.vl_tag) + \
+                  "If this device is not with you, please contact inventory admins" + \
+                  "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
 
-	subject = 'New Device {0} is assigned with your name'.format(vlid)
+        subject = 'New Device {0} is assigned with your name'.format(device.vl_tag)
         sender = "pchowdam@blackberry.com"
         recipients = []
         recipients.append(user.email)

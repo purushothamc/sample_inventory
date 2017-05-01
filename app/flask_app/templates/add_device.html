@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+ 
+{% block content %}
+  <h2>Add New Device</h2>
+  {% if success %}
+    <h3>{{ message }}</h3>
+
+  {% else %}
+
+    {% for message in form.variant.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.name.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.is_secure.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.part_number.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.imei_number.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.country.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.vlId.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.purpose_group.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    <form action="{{ url_for('add_device') }}" method=post>
+      {{ form.hidden_tag() }}
+
+      {{ form.variant.label }}
+      {{ form.variant }}
+
+      {{ form.name.label }}
+      {{ form.name }}
+
+      {{ form.is_secure.label }}
+      {{ form.is_secure }}
+
+      {{ form.part_number.label }}
+      {{ form.part_number }}
+
+      {{ form.imei_number.label }}
+      {{ form.imei_number }}
+
+      {{ form.country.label }}
+      {{ form.country }}
+
+      {{ form.vlId.label }}
+      {{ form.vlId }}
+
+      {{ form.purpose_group.label }}
+      {{ form.purpose_group }}
+
+      {{ form.submit }}
+    </form>
+  {% endif %}
+{% endblock %}

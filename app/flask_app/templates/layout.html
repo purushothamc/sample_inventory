@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BlackBerry Hyderabad Inventory</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <script src="{{ url_for('static', filename='js/table.js') }}"></script>
+  </head>
+  <body>
+
+  <header>
+    <div class="container">
+      <h1 class="logo">
+        <a href="{{ url_for('home') }} ">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Inventory App"
+                      style="width:200px;height:40px;border:1">
+        </a></h1>
+      <nav>
+        <ul class="menu">
+          {% if 'email' in session %}
+          <li><a href="{{ url_for('profile') }}">Home</a></li>
+          {% if 'is_admin' in session and session['is_admin'] %}
+            <li><a href="{{ url_for('add_device') }}">Add Device</a></li>
+            <li><a href="{{ url_for('assign_device_user') }}">Assign Device</a></li>
+            <li><a href="{{ url_for('assignment_history') }}">Device Assign History</a></li>
+          {% endif %}
+          <li><a href="{{ url_for('search_device') }}"> Search Devices</a></li>
+          <!--<li><a href="{{ url_for('change_password') }}">Change Password</a></li> -->
+          <li><a href="{{ url_for('signout') }}">Sign Out</a></li>
+          {% else %}
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('signin') }}">Sign In</a></li>
+          <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+  </body>
+</html>

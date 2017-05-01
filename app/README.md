@@ -1,0 +1,1 @@
+sample inventory flask application

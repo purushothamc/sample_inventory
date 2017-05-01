@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>Assignment History for device</h2>
+    {% if success %}
+        <h4>{{ message }}</h4>
+        <div id="demo">
+          <div class="table-responsive-vertical shadow-z-1">
+            <table id="table" class="table table-bordered table-hover table-mc-light-blue" align="center">
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>Device TAG</th>
+                  <th>User Assigned</th>
+                  <th>Assigned Date</th>
+                </tr>
+              </thead>
+                <tbody>
+                {% for elem in data %}
+                    <tr>
+                    <td data-title="S.No.">{{ loop.index }}</td>
+                      <td data-title="Device TAG">{{ elem[0] }}</td>
+                      <td data-title="User Assigned">{{ elem[1] }}</td>
+                      <td data-title="Assigned Date">{{ elem[2] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+              </div></div>
+
+    {% else %}
+        <h4>{{ message }}</h4>
+          {% for message in form.vlid.errors %}
+            <div class="flash">{{ message }}</div>
+          {% endfor %}
+
+          <form action="{{ url_for('assignment_history') }}" method=post>
+            {{ form.hidden_tag() }}
+
+            {{ form.vlid.label }}
+            {{ form.vlid }}
+
+            {{ form.submit }}
+         </form>
+    {% endif %}
+{% endblock %}

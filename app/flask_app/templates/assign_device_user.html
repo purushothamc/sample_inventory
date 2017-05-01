@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Assign a Device to User</h2>
+    {% if success %}
+        <h4>{{ message }}</h4>
+    {% else %}
+        <h4 style="color:red;">{{ message }}</h4>
+    {% endif %}
+
+  {% for message in form.vl_id.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  {% for message in form.email_id.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+  <form action="{{ url_for('assign_device_user') }}" method=post>
+    {{ form.hidden_tag() }}
+
+    {{ form.vl_id.label }}
+    {{ form.vl_id }}
+
+    {{ form.email_id.label }}
+    {{ form.email_id }}
+
+    {{ form.submit }}
+  </form>
+
+{% endblock %}

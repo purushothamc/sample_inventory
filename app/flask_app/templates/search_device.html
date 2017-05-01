@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Search Devices</h2>
+  {% if success %}
+    <h4>{{ message }}</h4>
+  <div id="demo">
+      <div class="table-responsive-vertical shadow-z-1">
+        <table id="table" class="table table-bordered table-hover table-mc-light-blue" align="center">
+          <thead>
+            <tr>
+              <th>S.No.</th>
+              <th>Name</th>
+              <th>Device Details</th>
+              <th>Assigned User</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for device in devices %}
+            <tr>
+              <td data-title="S.No.">{{ loop.index }}</td>
+              <td data-title="Name">{{ device.name }}</td>
+              <td data-title="Device Details">
+                <a href="{{ url_for('device_detail', vlid=device.vl_tag) }}" >{{ device.vl_tag }}</a>
+              </td>
+              {% if device.user_info.email == session['email'] %}
+                <td data-title="Assigned User">Already assigned to you</td>
+              {% else %}
+                <td data-title="Assigned User">
+                  <a href="{{ url_for('assign_device', vlid=device.vl_tag) }}" >Assign To Me</a>
+                </td>
+              {% endif %}
+            </tr>
+          </tbody>
+        {% endfor %}
+      </table>
+      </div></div>
+  <p>Back to Search Page <a href="{{ url_for('search_device') }}">Search Again </a></p>
+
+  {% else %}
+    {% if message %}
+      <h4 style="color:red;">{{ message }}</h4>
+    {% endif %}
+
+    {% for message in form.search_using.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in form.search_string.errors %}
+      <div class="flash">{{ message }}</div>
+    {% endfor %}
+
+    <form action="{{ url_for('search_device') }}" method=post>
+      {{ form.hidden_tag() }}
+
+      {{ form.search_using.label }}
+      {{ form.search_using }}
+
+      {{ form.search_string.label }}
+      {{ form.search_string }}
+
+      {{ form.submit }}
+    </form>
+  {% endif %}
+{% endblock %}

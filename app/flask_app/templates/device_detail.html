@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="jumbo">
+    {% if success %}
+      <h3>{{ message }}</h3>
+      <div id="demo">
+      <div class="table-responsive-vertical shadow-z-1">
+        <table id="table" class="table table-bordered table-hover table-mc-light-blue" align="center">
+            <tr><td>Device Variant</td><td>{{ info.variant }}</td></tr>
+            <tr><td>Device Name</td><td>{{ info.name }}</td></tr>
+            <tr><td>Device VLBB TD</td><td>{{ info.vl_tag }}</td></tr>
+            <tr><td>Device IMEI Number</td><td>{{ info.imei_number }}</td></tr>
+            <tr><td>Device Part Number</td><td>{{ info.part_number }}</td></tr>
+            <tr><td>Secure Device ?</td><td>{{ info.security == 0 }}</td></tr>
+            <tr><td>Manufactured Country</td><td>{{ info.mfg_country }}</td></tr>
+            <tr><td>Purpose Group</td><td>{{ info.purpose_group }}</td></tr>
+            <tr><td>Current Assignee</td><td>{{ user.firstname }}</td></tr>
+            <tr><td>Assigned date</td><td>{{ info.assigned_date }}</td></tr>
+        </table>
+      </div></div>
+    {% else %}
+      <h3>{{ message }}</h3>
+    {% endif %}
+  </div>
+{% endblock %}

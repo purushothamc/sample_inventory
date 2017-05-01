@@ -289,7 +289,7 @@ def assign_device(vlid):
               "If this device is not with you, please contact inventory admins" +\
               "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
     subject = 'New Device {0} is assigned with your name'.format(vlid)
-    sender = "pchowdam@blackberry.com"
+    sender = "<No-reply: Inventory Admin> hyd_inventory@blackberry.com"
     recipients = []
     recipients.append(user.email)
     recipients.append("ksunkara@blackberry.com")

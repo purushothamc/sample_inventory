@@ -14,7 +14,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config["MAIL_USERNAME"] = 'purush.bb10@gmail.com'
 app.config["MAIL_PASSWORD"] = 'cvssrmbpm'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:cvssrmbpm@localhost/development'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:cvssrmbpm@localhost/production'
 
 db = SQLAlchemy()
 db.init_app(app=app)

@@ -1,5 +1,5 @@
 from flask_app import app, db
-from flask import render_template, request, flash, session, redirect, url_for
+from flask import render_template, request, flash, session, redirect, url_for, jsonify
 from .forms import ContactForm, SignupForm, SigninForm, ChangePasswordForm, \
                     AddDeviceForm, SearchDeviceForm, DeviceAssignForm, AssignHistoryForm
 from flask_mail import Message, Mail
@@ -8,12 +8,27 @@ from functools import wraps
 from sqlalchemy import desc
 import datetime
 from threading import Thread
+from celery import Celery
 
 mail = Mail()
+
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
+
 recipients = []
 admins = ["gtadala@blackberry.com", "pchowdam@blackberry.com", "ksunkara@blackberry.com"]
 for admin in admins:
     recipients.append(admin)
+
+
+@celery.task
+def send_async_email(message_details):
+    """Background task to send an email with Flask-Mail."""
+    with app.app_context():
+        msg = Message(message_details['subject'], recipients=message_details['recipients'])
+        msg.body = message_details['body']
+        mail.send(msg)
+
 
 def login_required(f):
     @wraps(f)
@@ -369,20 +384,21 @@ def send_email_helper(user, device):
 
     # Send email to user
     subject = 'Device with VL Tag {0} assigned with your name'.format(device.vl_tag)
-    sender = "<no_reply>hyd_inventory@blackberry.com"
     recipients.append(user.email)
 
-    msg = Message(subject, sender=sender, recipients=[user.email])
-    msg.body = message
-    t1 = Thread(name="mail-sending-thread", target=mail.send(msg))
-    t1.start()
+    message_details = dict()
+    message_details["subject"] = subject
+    message_details["recipients"] = [user.email]
+    message_details["body"] = message
+
+    send_async_email.delay(message_details)
 
     # Send email to admins
     subject = 'Device with VL Tag {0} assigned to {1}'.format(device.vl_tag, user.firstname)
-    sender = "<no_reply>hyd_inventory@blackberry.com"
+    message_details["subject"] = subject
+    message_details["recipients"] = recipients
 
-    msg = Message(subject, sender=sender, recipients=recipients)
-    msg.body = message
-    t2 = Thread(name="mail-sending-thread", target=mail.send(msg))
-    t2.start()
+    send_async_email.delay(message_details)
+    # Done sending emails to users and admins
+
 

@@ -175,9 +175,9 @@ def add_device():
             return render_template('add_device.html', form=form)
         else:
             secure = to_bool(form.is_secure.data)
-            newDevice = Device(variant=form.variant.data, name=form.name.data.upper(), security=secure,
+            newDevice = Device(variant=form.variant.data.upprt(), name=form.name.data.upper(), security=secure,
                                part_number=form.part_number.data, imei=form.imei_number.data,
-                               country=form.country.data, vlid=form.vlId.data,
+                               country=form.country.data.upper(), vlid=form.vlId.data,
                                pgrp=form.purpose_group.data,
                                assigned_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             db.session.add(newDevice)
@@ -360,18 +360,29 @@ def assignment_history():
 
 
 def send_email_helper(user, device):
+    global recipients
     message = "Hello {0}, \n\nThe device with VL Tag {1} ".format(user.firstname, device.vl_tag) + \
               " is assigned to your name. \n" + \
               "\nIf this device is not with you, please contact inventory admins\n" + \
               "\nPlease visit " + url_for('profile', _external=True) + " for more details" + \
               "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
 
+    # Send email to user
     subject = 'Device with VL Tag {0} assigned with your name'.format(device.vl_tag)
     sender = "<no_reply>hyd_inventory@blackberry.com"
     recipients.append(user.email)
 
+    msg = Message(subject, sender=sender, recipients=[user.email])
+    msg.body = message
+    t1 = Thread(name="mail-sending-thread", target=mail.send(msg))
+    t1.start()
+
+    # Send email to admins
+    subject = 'Device with VL Tag {0} assigned to {1}'.format(device.vl_tag, user.firstname)
+    sender = "<no_reply>hyd_inventory@blackberry.com"
+
     msg = Message(subject, sender=sender, recipients=recipients)
     msg.body = message
-    t = Thread(name="mail-sending-thread", target=mail.send(msg))
-    t.start()
+    t2 = Thread(name="mail-sending-thread", target=mail.send(msg))
+    t2.start()
 

@@ -103,7 +103,7 @@ class AddDeviceForm(FlaskForm):
                                 choices=[('Shared Pool', 'Shared Pool'),
                                          ('automation', 'Automation'),
                                          ('development', 'Development'),
-                                         ('manual test', 'Manual Testing')])
+                                         ('manual_test', 'Manual Testing')])
     #device_status = SelectField('Device Status',
     #                            choices=[('usable', 'Good Condition'),
     #                                     ('battery_dead', 'Battery Problem'),

@@ -175,7 +175,7 @@ def add_device():
             return render_template('add_device.html', form=form)
         else:
             secure = to_bool(form.is_secure.data)
-            newDevice = Device(variant=form.variant.data, name=form.name.data, security=secure,
+            newDevice = Device(variant=form.variant.data, name=form.name.data.upper(), security=secure,
                                part_number=form.part_number.data, imei=form.imei_number.data,
                                country=form.country.data, vlid=form.vlId.data,
                                pgrp=form.purpose_group.data,
@@ -229,7 +229,7 @@ def search_device():
                     return render_template('search_device.html', form=form, message=message, success=False)
 
             elif form.search_using.data == "device_variant":
-                devices_list = Device.query.filter_by(variant=search_string).all()
+                devices_list = Device.query.filter(Device.variant.contains(search_string)).all()
                 if not devices_list:
                     message = "No Devices found with Device Variant {0}".format(search_string)
                     return render_template('search_device.html', form=form, message=message, success=False)
@@ -251,9 +251,9 @@ def search_device():
             elif form.search_using.data == "device_name":
                 message += " for device name: {0}".format(search_string.upper())
             elif form.search_using.data == "device_variant":
-                message += " for device variant: {0}".format(search_string.upper())
+                message += " for device variant contains words: {0}".format(search_string.upper())
             elif form.search_using.data == "user_email":
-                message += " for devices assigned to user with email address: {0}@blackberry.com".format(search_string)
+                message += " for devices assigned to user with email address contains letters: {0}".format(search_string)
 
             for device in devices_list:
                 device.user_info = User.query.filter_by(uid=device.assignee_id).first()

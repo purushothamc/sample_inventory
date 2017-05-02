@@ -10,7 +10,10 @@ import datetime
 from threading import Thread
 
 mail = Mail()
-
+recipients = []
+admins = ["gtadala@blackberry.com", "pchowdam@blackberry.com", "ksunkara@blackberry.com"]
+for admin in admins:
+    recipients.append(admin)
 
 def login_required(f):
     @wraps(f)
@@ -99,7 +102,6 @@ def device_detail(vlid):
         return redirect(url_for('signin'))
 
     device_info = Device.query.filter_by(vl_tag=vlid).first()
-    print(Device.__table__.columns.keys())
 
     if not device_info:
         message = "Device Information is not found for device with ID {0}".format(vlid)
@@ -264,6 +266,7 @@ def assign_device(vlid):
     if 'email' not in session:
         return redirect(url_for('signin'))
 
+    global recipients
     device_info = Device.query.filter_by(vl_tag=vlid).first()
 
     if not device_info:
@@ -284,22 +287,8 @@ def assign_device(vlid):
     db.session.add(newDeviceAssignment)
     db.session.commit()
 
-    # send email to admins aand usrs
-    message = "Hello {0}, \n\n The device with VL Tag {1} is assigned to your name \n ".format(user.firstname, vlid) + \
-              "If this device is not with you, please contact inventory admins" +\
-              "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
-    subject = 'New Device {0} is assigned with your name'.format(vlid)
-    sender = "<No-reply: Inventory Admin> hyd_inventory@blackberry.com"
-    recipients = []
-    recipients.append(user.email)
-    recipients.append("ksunkara@blackberry.com")
-    recipients.append("gtadala@blackberry.com")
-    recipients.append("pchowdam@blackberry.com")
-  
-    msg = Message(subject, sender=sender, recipients=recipients)
-    msg.body = message
-    t = Thread(name="mail-sending-thread", target=mail.send(msg))
-    t.start()
+    # Send Email to users / admins
+    send_email_helper(user, device)
 
     message = "Device with VLBB ID {0} is assigned with your name".format(vlid)
     return render_template('search_device.html', success=True, message=message, from_assigned=True)
@@ -307,6 +296,7 @@ def assign_device(vlid):
 @app.route('/assign_device_user', methods=['POST', 'GET'])
 def assign_device_user():
     form = DeviceAssignForm()
+    global recipients
     if 'email' not in session or not session['is_admin']:
         return redirect(url_for('signin'))
 
@@ -333,26 +323,12 @@ def assign_device_user():
         db.session.add(newDeviceAssignment)
         db.session.commit()
 
-        message = "Hello {0}, \n\n The device with VL Tag {1} is assigned to your name \n ".format(user.firstname,
-                                                                                                   device.vl_tag) + \
-                  "If this device is not with you, please contact inventory admins" + \
-                  "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
-
-        subject = 'New Device {0} is assigned with your name'.format(device.vl_tag)
-        sender = "pchowdam@blackberry.com"
-        recipients = []
-        recipients.append(user.email)
-        recipients.append("ksunkara@blackberry.com")
-        recipients.append("gtadala@blackberry.com")
-        recipients.append("pchowdam@blackberry.com")
-
-        msg = Message(subject, sender=sender, recipients=recipients)
-        msg.body = message
-        t = Thread(name="mail-sending-thread", target=mail.send(msg))
-        t.start()
+        # Send Email to users / admins
+        send_email_helper(user, device)
 
         message = "User is assigned with device {0}".format(device.vl_tag)
         return render_template('assign_device_user.html', form=form, success=True, message=message)
+
 
 @app.route('/assignment_history', methods=['POST', 'GET'])
 def assignment_history():
@@ -376,9 +352,26 @@ def assignment_history():
         temp.append(User.query.filter_by(uid=_d.user_id).first().firstname)
         temp.append(_d.device_assigned_date)
         output.append(temp)
-    print(output)
     if not device:
         message = "No devices found with selected VLBB ID {0}".format(form.vlid.data)
         return render_template('assignment_history.html', form=form, success=False, message=message)
     message = "Device Assignment History for device with VLBB ID: {0}".format(format(form.vlid.data))
     return render_template('assignment_history.html', form=form, success=True, message=message, data=output)
+
+
+def send_email_helper(user, device):
+    message = "Hello {0}, \n\nThe device with VL Tag {1} ".format(user.firstname, device.vl_tag) + \
+              " is assigned to your name. \n" + \
+              "\nIf this device is not with you, please contact inventory admins\n" + \
+              "\nPlease visit " + url_for('profile', _external=True) + " for more details" + \
+              "\n\n Thanks, \n BlackBerry Hyderabad Inventory Team"
+
+    subject = 'Device with VL Tag {0} assigned with your name'.format(device.vl_tag)
+    sender = "<no_reply>hyd_inventory@blackberry.com"
+    recipients.append(user.email)
+
+    msg = Message(subject, sender=sender, recipients=recipients)
+    msg.body = message
+    t = Thread(name="mail-sending-thread", target=mail.send(msg))
+    t.start()
+

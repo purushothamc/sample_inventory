@@ -14,7 +14,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config["MAIL_USERNAME"] = None #'pchowdam@blackberry.com'
 app.config["MAIL_PASSWORD"] = None #'MA21hsER_'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:cvssrmbpm@localhost/production'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:blackberry@localhost/production'
 
 db = SQLAlchemy()
 db.init_app(app=app)

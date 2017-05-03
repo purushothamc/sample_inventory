@@ -43,10 +43,11 @@ class Device(db.Model):
     vl_tag = db.Column(db.String(10), unique=True, nullable=False)
     purpose_group = db.Column(db.String(20))
     assigned_date = db.Column(db.DateTime, nullable=False, index=True)
+    comments = db.Column(db.String(255))
 
     assignee_id = db.Column(db.Integer, db.ForeignKey('users.uid'), nullable=False, default=1)
 
-    def __init__(self, variant, name, security, part_number, imei, country, vlid, pgrp, assigned_date, assignee=1):
+    def __init__(self, variant, name, security, part_number, imei, country, vlid, pgrp, assigned_date, comments, assignee=1):
         self.variant = variant.title()
         self.name = name.title().upper()
         self.is_device_secure(str(security).lower())
@@ -56,6 +57,7 @@ class Device(db.Model):
         self.vl_tag = vlid.title().upper()
         self.purpose_group = pgrp.title()
         self.assigned_date = assigned_date
+        self.comments = comments
         if not assignee:
             self.assigned_id = 1
         else:

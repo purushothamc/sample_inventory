@@ -104,10 +104,7 @@ class AddDeviceForm(FlaskForm):
                                          ('automation', 'Automation'),
                                          ('development', 'Development'),
                                          ('manual_test', 'Manual Testing')])
-    #device_status = SelectField('Device Status',
-    #                            choices=[('usable', 'Good Condition'),
-    #                                     ('battery_dead', 'Battery Problem'),
-    #                                     ('not_booting', 'Not Booting')])
+    comments = TextAreaField("Comments", [validators.DataRequired("Please enter comments if any")])
     submit = SubmitField("Add New Device To DB")
 
 class SearchDeviceForm(FlaskForm):

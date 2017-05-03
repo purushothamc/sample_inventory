@@ -15,16 +15,14 @@ mail = Mail()
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
-recipients = []
 admins = ["gtadala@blackberry.com", "pchowdam@blackberry.com", "ksunkara@blackberry.com"]
-for admin in admins:
-    recipients.append(admin)
 
 
 @celery.task
 def send_async_email(message_details):
     """Background task to send an email with Flask-Mail."""
     with app.app_context():
+        print (message_details['recipients'])
         msg = Message(message_details['subject'], recipients=message_details['recipients'])
         msg.body = message_details['body']
         mail.send(msg)
@@ -190,10 +188,10 @@ def add_device():
             return render_template('add_device.html', form=form)
         else:
             secure = to_bool(form.is_secure.data)
-            newDevice = Device(variant=form.variant.data.upprt(), name=form.name.data.upper(), security=secure,
+            newDevice = Device(variant=form.variant.data.upper(), name=form.name.data.upper(), security=secure,
                                part_number=form.part_number.data, imei=form.imei_number.data,
                                country=form.country.data.upper(), vlid=form.vlId.data,
-                               pgrp=form.purpose_group.data,
+                               pgrp=form.purpose_group.data, comments=form.comments.data,
                                assigned_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             db.session.add(newDevice)
             db.session.commit()
@@ -238,7 +236,7 @@ def search_device():
                     return render_template('search_device.html', form=form, message=message, success=False)
 
             elif form.search_using.data == "device_name":
-                devices_list = Device.query.filter_by(name=search_string.upper()).all()
+                devices_list = Device.query.filter(Device.name.contains(search_string.upper())).all()
                 if not devices_list:
                     message = "No Devices found with Device Name {0}".format(search_string)
                     return render_template('search_device.html', form=form, message=message, success=False)
@@ -281,7 +279,6 @@ def assign_device(vlid):
     if 'email' not in session:
         return redirect(url_for('signin'))
 
-    global recipients
     device_info = Device.query.filter_by(vl_tag=vlid).first()
 
     if not device_info:
@@ -308,10 +305,11 @@ def assign_device(vlid):
     message = "Device with VLBB ID {0} is assigned with your name".format(vlid)
     return render_template('search_device.html', success=True, message=message, from_assigned=True)
 
+
 @app.route('/assign_device_user', methods=['POST', 'GET'])
 def assign_device_user():
     form = DeviceAssignForm()
-    global recipients
+
     if 'email' not in session or not session['is_admin']:
         return redirect(url_for('signin'))
 
@@ -323,7 +321,15 @@ def assign_device_user():
             return render_template('assign_device_user.html', form=form)
 
     user = User.query.filter_by(email=form.email_id.data.lower()).first()
+    if not user:
+        message = "User might not have registered his email id, ask him to register"
+        return render_template('assign_device_user.html', form=form, success=False, message=message)
+
     device = Device.query.filter_by(vl_tag=form.vl_id.data).first()
+    if not device:
+        message = "Deice not found with VLBB Tag {0}, please check the data entered".format(form.vl_id.data)
+        return render_template('assign_device_user.html', form=form, success=False, message=message)
+
     if device.assignee_id == user.uid:
         message = "User is already assigned with selected device"
         return render_template('assign_device_user.html', form=form, success=False, message=message)
@@ -375,7 +381,7 @@ def assignment_history():
 
 
 def send_email_helper(user, device):
-    global recipients
+
     message = "Hello {0}, \n\nThe device with VL Tag {1} ".format(user.firstname, device.vl_tag) + \
               " is assigned to your name. \n" + \
               "\nIf this device is not with you, please contact inventory admins\n" + \
@@ -384,7 +390,6 @@ def send_email_helper(user, device):
 
     # Send email to user
     subject = 'Device with VL Tag {0} assigned with your name'.format(device.vl_tag)
-    recipients.append(user.email)
 
     message_details = dict()
     message_details["subject"] = subject
@@ -396,7 +401,7 @@ def send_email_helper(user, device):
     # Send email to admins
     subject = 'Device with VL Tag {0} assigned to {1}'.format(device.vl_tag, user.firstname)
     message_details["subject"] = subject
-    message_details["recipients"] = recipients
+    message_details["recipients"] = admins
 
     send_async_email.delay(message_details)
     # Done sending emails to users and admins

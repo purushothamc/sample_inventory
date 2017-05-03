@@ -104,7 +104,7 @@ class AddDeviceForm(FlaskForm):
                                          ('automation', 'Automation'),
                                          ('development', 'Development'),
                                          ('manual_test', 'Manual Testing')])
-    comments = TextAreaField("Comments", [validators.DataRequired("Please enter comments if any")])
+    comments = TextAreaField("Comments")
     submit = SubmitField("Add New Device To DB")
 
 class SearchDeviceForm(FlaskForm):

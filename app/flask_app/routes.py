@@ -22,7 +22,6 @@ admins = ["gtadala@blackberry.com", "pchowdam@blackberry.com", "ksunkara@blackbe
 def send_async_email(message_details):
     """Background task to send an email with Flask-Mail."""
     with app.app_context():
-        print (message_details['recipients'])
         msg = Message(message_details['subject'], recipients=message_details['recipients'])
         msg.body = message_details['body']
         mail.send(msg)
@@ -193,12 +192,14 @@ def add_device():
                                country=form.country.data.upper(), vlid=form.vlId.data,
                                pgrp=form.purpose_group.data, comments=form.comments.data,
                                assigned_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
             db.session.add(newDevice)
             db.session.commit()
 
+            user = User.query.filter_by(uid=1).first()
             device_info = Device.query.filter_by(vl_tag=form.vlId.data).first()
             newDeviceAssignment = DeviceAssignment(device_id=device_info.uid,
-                                                   user_id=1, device_assigned_date=device_info.assigned_date)
+                                                   user_id=user.uid, device_assigned_date=device_info.assigned_date)
             db.session.add(newDeviceAssignment)
             db.session.commit()
 
@@ -363,9 +364,19 @@ def assignment_history():
     elif request.method == 'POST':
         if not form.validate():
             return render_template('assignment_history.html', form=form)
-    d_id = Device.query.filter_by(vl_tag=form.vlid.data).first().uid
-    device = DeviceAssignment.query.filter_by(device_id=d_id).\
+    search_device = Device.query.filter_by(vl_tag=form.vlid.data).first()
+
+
+    if not search_device:
+        message = "No devices found with selected VLBB ID {0}".format(form.vlid.data)
+        return render_template('assignment_history.html', form=form, success=False, message=message)
+
+    device = DeviceAssignment.query.filter_by(device_id=search_device.uid).\
         order_by(desc(DeviceAssignment.device_assigned_date)).all()
+    if not device:
+        message = "No devices found with selected VLBB ID {0}".format(form.vlid.data)
+        return render_template('assignment_history.html', form=form, success=False, message=message)
+
     output = []
     for _d in device:
         temp = []
@@ -373,9 +384,7 @@ def assignment_history():
         temp.append(User.query.filter_by(uid=_d.user_id).first().firstname)
         temp.append(_d.device_assigned_date)
         output.append(temp)
-    if not device:
-        message = "No devices found with selected VLBB ID {0}".format(form.vlid.data)
-        return render_template('assignment_history.html', form=form, success=False, message=message)
+
     message = "Device Assignment History for device with VLBB ID: {0}".format(format(form.vlid.data))
     return render_template('assignment_history.html', form=form, success=True, message=message, data=output)
 

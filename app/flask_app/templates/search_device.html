@@ -12,6 +12,7 @@
               <th>S.No.</th>
               <th>Name</th>
               <th>Device Details</th>
+              <th>Current Assignee</th>
               <th>Assigned User</th>
             </tr>
           </thead>
@@ -23,6 +24,7 @@
               <td data-title="Device Details">
                 <a href="{{ url_for('device_detail', vlid=device.vl_tag) }}" >{{ device.vl_tag }}</a>
               </td>
+              <td data-title="Current Assignee">{{ device.user_info.firstname }}</td>
               {% if device.user_info.email == session['email'] %}
                 <td data-title="Assigned User">Already assigned to you</td>
               {% else %}

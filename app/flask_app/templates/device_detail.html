@@ -15,6 +15,7 @@
             <tr><td>Manufactured Country</td><td>{{ info.mfg_country }}</td></tr>
             <tr><td>Purpose Group</td><td>{{ info.purpose_group }}</td></tr>
             <tr><td>Current Assignee</td><td>{{ user.firstname }}</td></tr>
+            <tr><td>Assignee Email Id</td><td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td></tr>
             <tr><td>Assigned date</td><td>{{ info.assigned_date }}</td></tr>
             <tr><td>Comments</td><td>{{ info.comments }}</td></tr>
         </table>

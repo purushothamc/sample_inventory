@@ -21,9 +21,10 @@
           {% if 'email' in session %}
           <li><a href="{{ url_for('profile') }}">Home</a></li>
           {% if 'is_admin' in session and session['is_admin'] %}
+            <li><a href="{{ url_for('all_devices') }}">All Devices</a></li>
             <li><a href="{{ url_for('add_device') }}">Add Device</a></li>
-            <li><a href="{{ url_for('assign_device_user') }}">Assign Device</a></li>
-            <li><a href="{{ url_for('assignment_history') }}">Device Assign History</a></li>
+            <li><a href="{{ url_for('assign_device_user') }}">Assign</a></li>
+            <li><a href="{{ url_for('assignment_history') }}">Device History</a></li>
           {% endif %}
           <li><a href="{{ url_for('search_device') }}"> Search Devices</a></li>
           <li><a href="{{ url_for('change_password') }}">Change Password</a></li>

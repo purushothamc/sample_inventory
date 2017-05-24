@@ -415,4 +415,22 @@ def send_email_helper(user, device):
     send_async_email.delay(message_details)
     # Done sending emails to users and admins
 
+@app.route('/all_devices')
+def all_devices():
+    if 'email' not in session:
+        return redirect(url_for('signin'))
+
+    user = User.query.filter_by(email=session['email']).first()
+
+    if user is None:
+        return redirect(url_for('signin'))
+    else:
+        devices_list = Device.query.all()
+        if not devices_list:
+            message = "No devices available in inventory"
+            return render_template('all_devices.html', success=False, message=message, user=user)
+
+        message = "Following list of currently in BB Hyderabad"
+        return render_template('all_devices.html', success=True, devices=devices_list, message=message, user=user)
+
 
